@@ -20,8 +20,10 @@ namespace MADAM_Server
     //to the central server. Detects network interfaces, uses netmask from this to scan correct subnets.
     public partial class frmMadamServer : Form
     {
+        //imports dll for using arp resolution
         [DllImport("iphlpapi.dll", ExactSpelling = true)]
         public static extern int SendARP(int DestIP, int SrcIP, byte[] pMacAddr, ref uint PhyAddrLen);
+
         Thread scanThread;
         NetworkInterface[] adapters = new NetworkInterface[10];
         List<string> subnetList = new List<string>();
@@ -35,7 +37,7 @@ namespace MADAM_Server
 
         
         
-
+        //returns a mac address by using arp resolution for a given IP address
         private string GetMacUsingARP(string IPAddr)
         {
             IPAddress IP = IPAddress.Parse(IPAddr);
@@ -56,6 +58,7 @@ namespace MADAM_Server
             scanThread = new Thread(scan);
             scanThread.Start();
 
+            //disables buttons while running
             if (scanThread.IsAlive)
             {
                 btnScan.Enabled = false;
@@ -64,7 +67,7 @@ namespace MADAM_Server
             
         }
 
-        public void scan()
+        public async void scan()
         {
             string subnet = txtSubnet.Text;
 
@@ -79,13 +82,14 @@ namespace MADAM_Server
             }
             else
             {
+                //loops for 0-255 
                 for (int i = 1; i < 255; i++)
                 {
                     string subnetn = "." + i.ToString();
                     ping = new Ping();
-                    pingReply = ping.Send(subnet + subnetn);
+                    pingReply = await ping.SendPingAsync(subnet + subnetn);
                     
-
+                    //on successful ping, make new instance of a device
                     if (pingReply.Status == IPStatus.Success)
                     {
                         try
@@ -98,22 +102,21 @@ namespace MADAM_Server
                             device.hostName = ipHostEntry.HostName.ToString();
                             device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
                             device.ipAddr = addr.ToString();
-                            
-
+                            //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
                             AppendTextBox(device.ipAddr + " " + device.name + " Up " + System.Environment.NewLine);
-                            Thread.Sleep(1000);
+                            Thread.Sleep(10);
                             count ++;
                         }
 
                         catch
                         {
-
+                            MessageBox.Show("Uhoh, somenthing broke!", "Scan Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
-
+                    Console.WriteLine(i);
                     if (i == 254)
                     {
-                        MessageBox.Show(this, string.Format("Scan on network {0} complete, found {1} devices",subnet,count), "Scan Complete!");
+                        MessageBox.Show(this, string.Format("Scan on network {0}/24 complete, found {1} devices",subnet,count), "Scan Complete!");
 
                     }
                 }
@@ -122,7 +125,7 @@ namespace MADAM_Server
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            scanThread.Suspend();
+            scanThread.Abort();
             btnStop.Enabled = false;
             btnScan.Enabled = true;
 
