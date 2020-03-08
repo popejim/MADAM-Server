@@ -6,11 +6,13 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MADAM_Server.Classes;
 using System.Threading;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Windows.Forms;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
 namespace MADAM_Server
 {
@@ -18,7 +20,8 @@ namespace MADAM_Server
     //to the central server. Detects network interfaces, uses netmask from this to scan correct subnets.
     public partial class frmMadamServer : Form
     {
-
+        [DllImport("iphlpapi.dll", ExactSpelling = true)]
+        public static extern int SendARP(int DestIP, int SrcIP, byte[] pMacAddr, ref uint PhyAddrLen);
         Thread scanThread;
         NetworkInterface[] adapters = new NetworkInterface[10];
         List<string> subnetList = new List<string>();
@@ -30,6 +33,24 @@ namespace MADAM_Server
             cmbInterfaces.SelectedIndex = 0;
         }
 
+        
+        
+
+        private string GetMacUsingARP(string IPAddr)
+        {
+            IPAddress IP = IPAddress.Parse(IPAddr);
+            byte[] macAddr = new byte[6];
+            uint macAddrLen = (uint)macAddr.Length;
+
+            if (SendARP((int)IP.Address, 0, macAddr, ref macAddrLen) != 0)
+                throw new Exception("ARP command failed");
+
+            string[] str = new string[(int)macAddrLen];
+            for (int i = 0; i < macAddrLen; i++)
+                str[i] = macAddr[i].ToString("x2");
+
+            return string.Join(":", str);
+        }
         private void btnScan_Click(object sender, EventArgs e)
         {
             scanThread = new Thread(scan);
@@ -43,7 +64,7 @@ namespace MADAM_Server
             
         }
 
-        private void scan()
+        public void scan()
         {
             string subnet = txtSubnet.Text;
 
@@ -70,8 +91,16 @@ namespace MADAM_Server
                         try
                         {
                             addr = IPAddress.Parse(subnet + subnetn);
+                            
+                            Device device = new Device();
                             ipHostEntry = Dns.GetHostEntry(addr);
-                            AppendTextBox(subnet + subnetn + " " + ipHostEntry.HostName.ToString() + " Up " + System.Environment.NewLine);
+                            device.macAddr = GetMacUsingARP(addr.ToString());
+                            device.hostName = ipHostEntry.HostName.ToString();
+                            device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
+                            device.ipAddr = addr.ToString();
+                            
+
+                            AppendTextBox(device.ipAddr + " " + device.name + " Up " + System.Environment.NewLine);
                             Thread.Sleep(1000);
                             count ++;
                         }

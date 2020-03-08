@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MADAM_Server.Classes
 {
-    class Device
+    public class Device
     {
         public string name { get; set; }
         public string ipAddr { get; set; }
