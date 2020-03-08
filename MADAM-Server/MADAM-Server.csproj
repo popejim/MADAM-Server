@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Device.cs" />
     <Compile Include="MADAM Server.cs">
       <SubType>Form</SubType>
     </Compile>

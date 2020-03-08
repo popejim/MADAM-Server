@@ -125,7 +125,6 @@ namespace MADAM_Server
 
                         if (unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
-
                             maskList.Add(Convert.ToString(unicastIPAddressInformation.IPv4Mask));
                             subnetList.Add(Convert.ToString(unicastIPAddressInformation.Address));
                         }
@@ -159,21 +158,17 @@ namespace MADAM_Server
 
             string resultIP = string.Join(".", result);
 
-            if (snOct[0] == "0")
-            {
-                string final = resultIP.Remove(resultIP.Length-8);
-                txtSubnet.Text = final;
-            }
-
-            else if (snOct[1] == "0")
+            if (snOct[1] == "0")
             {
                 string final = resultIP.Remove(resultIP.Length - 6);
+                final = final + ".0.0";
                 txtSubnet.Text = final;
             }
 
             else if (snOct[2] == "0")
             {
                 string final = resultIP.Remove(resultIP.Length - 4);
+                final = final + ".0";
                 txtSubnet.Text = final;
             }
 
