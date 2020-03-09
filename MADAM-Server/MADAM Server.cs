@@ -76,6 +76,7 @@ namespace MADAM_Server
             Ping ping;
             PingReply pingReply;
             IPAddress addr;
+            
             int count = 0;
             if (txtSubnet.Text == "")
             {
@@ -84,7 +85,7 @@ namespace MADAM_Server
             else
             {
                 //loops for 0-255 
-                for (int i = 1; i < 255; i++)
+                for (int i = 100; i < 255; i++)
                 {
                     string subnetn = "." + i.ToString();
                     ping = new Ping();
@@ -96,16 +97,27 @@ namespace MADAM_Server
                         try
                         {
                             addr = IPAddress.Parse(subnet + subnetn);
-                            
                             Device device = new Device();
-                            ipHostEntry = Dns.GetHostEntry(addr);
+
+                            try
+                            {
+                                ipHostEntry = Dns.GetHostEntry(addr);
+                                device.hostName = ipHostEntry.HostName.ToString();
+                                device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
+                            }
+                            catch (SocketException e)
+                            {
+                                Console.WriteLine(e);
+                                device.hostName = "Switch";
+                                device.name = "Switch";
+                            }
+                            
                             device.macAddr = GetMacUsingARP(addr.ToString());
-                            device.hostName = ipHostEntry.HostName.ToString();
-                            device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
                             device.ipAddr = addr.ToString();
+                            device.osVersion = getOsVersion(addr.ToString());
                             //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
-                            AppendTextBox(device.ipAddr + " " + device.name + " Up " + System.Environment.NewLine);
-                            Thread.Sleep(10);
+                            AppendTextBox(device.ipAddr + " " + device.name + " Up "  + " OS version " + device.osVersion + " Mac address" + device.macAddr + System.Environment.NewLine);
+                            Thread.Sleep(100);
                             count ++;
                         }
 
@@ -117,8 +129,7 @@ namespace MADAM_Server
                     Console.WriteLine(i);
                     if (i == 254)
                     {
-                        MessageBox.Show(this, string.Format("Scan on network {0}/24 complete, found {1} devices",subnet,count), "Scan Complete!");
-
+                        MessageBox.Show(string.Format("Scan on network {0}.0/24 complete, found {1} devices",subnet,count), "Scan Complete!");
                     }
                 }
             }
@@ -146,7 +157,7 @@ namespace MADAM_Server
             int i = 0;
             
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
-        {
+            {
                 if (Convert.ToString(adapter.OperationalStatus) == "Up")
                 {
                     cmbInterfaces.Items.Add(adapter.Name);
@@ -163,10 +174,7 @@ namespace MADAM_Server
                         }
                     }
                 }
-            
-
-        }
-           
+            }
         }
 
         private void cmbInterfaces_SelectedIndexChanged(object sender, EventArgs e)
@@ -177,10 +185,17 @@ namespace MADAM_Server
 
         private string getOsVersion(string ipAddr)
         {
-            using (var reg = RegistryKey.OpenRemoteBaseKey(RegistryHive.LocalMachine, ipAddr))
-            using (var key = reg.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\"))
+            try
             {
-                return string.Format("Name:{0}, Version:{1}", key.GetValue("ProductName"), key.GetValue("CurrentVersion"));
+                using (var reg = RegistryKey.OpenRemoteBaseKey(RegistryHive.LocalMachine, ipAddr))
+                using (var key = reg.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\"))
+                {
+                    return string.Format("Name:{0}, Version:{1}", key.GetValue("ProductName"), key.GetValue("CurrentVersion"));
+                }
+            }
+            catch
+            {
+                return string.Format("Unknown OS");
             }
         }
 

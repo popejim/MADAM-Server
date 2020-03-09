@@ -12,7 +12,7 @@ namespace MADAM_Server.Classes
         public string ipAddr { get; set; }
         public string macAddr { get; set; }
         public string hostName { get; set; }
-
+        public string osVersion { get; set; }
     
     }
 }
