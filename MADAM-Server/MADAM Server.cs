@@ -13,6 +13,7 @@ using System.Net.NetworkInformation;
 using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace MADAM_Server
 {
@@ -125,7 +126,7 @@ namespace MADAM_Server
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            scanThread.Abort();
+            scanThread.Suspend();
             btnStop.Enabled = false;
             btnScan.Enabled = true;
 
@@ -172,6 +173,15 @@ namespace MADAM_Server
         {
             calculateSubnet(subnetList[cmbInterfaces.SelectedIndex], maskList[cmbInterfaces.SelectedIndex]);
             
+        }
+
+        private string getOsVersion(string ipAddr)
+        {
+            using (var reg = RegistryKey.OpenRemoteBaseKey(RegistryHive.LocalMachine, ipAddr))
+            using (var key = reg.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\"))
+            {
+                return string.Format("Name:{0}, Version:{1}", key.GetValue("ProductName"), key.GetValue("CurrentVersion"));
+            }
         }
 
         private void calculateSubnet(string ipAddress, string subNetMask)
