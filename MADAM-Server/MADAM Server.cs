@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
+using RestSharp;
 
 namespace MADAM_Server
 {
@@ -86,7 +87,7 @@ namespace MADAM_Server
             else
             {
                 //loops for 0-255 
-                for (int i = 1; i < 255; i++)
+                for (int i = 15; i < 255; i++)
                 {
                     if (hasStarted == false)
                     {
@@ -120,11 +121,13 @@ namespace MADAM_Server
                             catch (Exception e)
                             {
                                 Console.WriteLine(e);
+
                                 device.hostName = "Unkown Device";
                                 device.name = "Unkown Device";
                             }
                             
                             device.macAddr = GetMacUsingARP(addr.ToString());
+                            device.Manufacturer = macApiLookup(device.macAddr);
                             device.ipAddr = addr.ToString();
                             device.osVersion = getOsVersion(addr.ToString());
                             //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
@@ -255,6 +258,15 @@ namespace MADAM_Server
         private void frmMadamServer_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private string macApiLookup(string mac)
+        {
+            var client = new RestClient("https://api.macvendors.com/" + mac);
+            var request = new RestRequest(Method.GET);
+            IRestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            return response.Content;
         }
     }
 }
