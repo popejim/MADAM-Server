@@ -25,6 +25,7 @@ namespace MADAM_Server
         [DllImport("iphlpapi.dll", ExactSpelling = true)]
         public static extern int SendARP(int DestIP, int SrcIP, byte[] pMacAddr, ref uint PhyAddrLen);
 
+        public bool hasStarted;
         Thread scanThread;
         NetworkInterface[] adapters = new NetworkInterface[10];
         List<string> subnetList = new List<string>();
@@ -45,10 +46,10 @@ namespace MADAM_Server
             byte[] macAddr = new byte[6];
             uint macAddrLen = (uint)macAddr.Length;
 
-            if (SendARP((int)IP.Address, 0, macAddr, ref macAddrLen) != 0)
-                throw new Exception("ARP command failed");
+            if (SendARP((int)IP.Address, 0, macAddr, ref macAddrLen) != 0)throw new Exception("ARP command failed");
 
             string[] str = new string[(int)macAddrLen];
+
             for (int i = 0; i < macAddrLen; i++)
                 str[i] = macAddr[i].ToString("x2");
 
@@ -58,7 +59,7 @@ namespace MADAM_Server
         {
             scanThread = new Thread(scan);
             scanThread.Start();
-
+            hasStarted = true;
             //disables buttons while running
             if (scanThread.IsAlive)
             {
@@ -85,8 +86,12 @@ namespace MADAM_Server
             else
             {
                 //loops for 0-255 
-                for (int i = 100; i < 255; i++)
+                for (int i = 1; i < 255; i++)
                 {
+                    if (hasStarted == false)
+                    {
+                        break;
+                    }
                     string subnetn = "." + i.ToString();
                     ping = new Ping();
                     pingReply = await ping.SendPingAsync(subnet + subnetn);
@@ -103,13 +108,20 @@ namespace MADAM_Server
                             {
                                 ipHostEntry = Dns.GetHostEntry(addr);
                                 device.hostName = ipHostEntry.HostName.ToString();
-                                device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
+                                if (ipHostEntry.HostName.ToString().Contains("."))
+                                {
+                                    device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
+                                }
+                                else
+                                {
+                                    device.name = device.hostName;
+                                }
                             }
-                            catch (SocketException e)
+                            catch (Exception e)
                             {
                                 Console.WriteLine(e);
-                                device.hostName = "Switch";
-                                device.name = "Switch";
+                                device.hostName = "Unkown Device";
+                                device.name = "Unkown Device";
                             }
                             
                             device.macAddr = GetMacUsingARP(addr.ToString());
@@ -127,6 +139,9 @@ namespace MADAM_Server
                         }
                     }
                     Console.WriteLine(i);
+
+                    
+
                     if (i == 254)
                     {
                         MessageBox.Show(string.Format("Scan on network {0}.0/24 complete, found {1} devices",subnet,count), "Scan Complete!");
@@ -135,9 +150,10 @@ namespace MADAM_Server
             }
         }
 
+
         private void btnStop_Click(object sender, EventArgs e)
         {
-            scanThread.Suspend();
+            hasStarted = false;
             btnStop.Enabled = false;
             btnScan.Enabled = true;
 
@@ -234,6 +250,11 @@ namespace MADAM_Server
                 string final = resultIP.Remove(resultIP.Length - 2);
                 txtSubnet.Text = final;
             }
+        }
+
+        private void frmMadamServer_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
