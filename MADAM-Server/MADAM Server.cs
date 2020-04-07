@@ -45,18 +45,29 @@ namespace MADAM_Server
         //returns a mac address by using arp resolution for a given IP address
         private string GetMacUsingARP(string IPAddr)
         {
-            IPAddress IP = IPAddress.Parse(IPAddr);
+            //IPAddress IP = IPAddress.Parse(IPAddr);
             byte[] macAddr = new byte[6];
             uint macAddrLen = (uint)macAddr.Length;
+            try
+            {
 
-            if (SendARP((int)IP.Address, 0, macAddr, ref macAddrLen) != 0)throw new Exception("ARP command failed");
+                if (SendARP(Convert.ToInt32(IPAddr), 0, macAddr, ref macAddrLen) != 0)
+                {
+                    return null;
+                    throw new Exception("ARP command failed");
+                }
+            }
 
-            string[] str = new string[(int)macAddrLen];
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+                string[] str = new string[(int)macAddrLen];
 
-            for (int i = 0; i < macAddrLen; i++)
-                str[i] = macAddr[i].ToString("x2");
+                for (int i = 0; i < macAddrLen; i++)
+                    str[i] = macAddr[i].ToString("x2");
 
-            return string.Join(":", str);
+                return string.Join(":", str);
         }
         private void btnScan_Click(object sender, EventArgs e)
         {
@@ -82,7 +93,7 @@ namespace MADAM_Server
                 
             }
             Ping pingSender = new Ping();
-            var tasks = allip.Select(ip => new Ping().SendPingAsync(ip, 100));
+            var tasks = allip.Select(ip => new Ping().SendPingAsync(ip, 1000));
 
             var results = await Task.WhenAll(tasks);
 
@@ -113,9 +124,10 @@ namespace MADAM_Server
 
                         try
                         {
+                            //ipHostEntry = Dns.GetHostEntry(addr.ToString());
                             ipHostEntry = Dns.GetHostEntry(addr.ToString());
                             device.hostName = ipHostEntry.HostName.ToString();
-
+                            
                             if (ipHostEntry.HostName.ToString().Contains("."))
                             {
                                 device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
@@ -129,16 +141,25 @@ namespace MADAM_Server
                         catch (Exception e)
                         {
                             Console.WriteLine(e);
-                            device.hostName = "Unkown Device";
-                            device.name = "Unkown Device";
+                            device.hostName = "Unknown Device";
+                            device.name = "Unknown Device";
                         }
 
                         device.macAddr = GetMacUsingARP(addr.ToString());
                         device.Manufacturer = macApiLookup(device.macAddr);
                         device.ipAddr = addr.ToString();
                         device.osVersion = getOsVersion(addr.ToString());
+                        if (device.Manufacturer.Contains("HUAWEI"))
+                        {
+                            device.osVersion = "Android OS";
+                        }
+                        else if (device.Manufacturer.Contains("Google"))
+                        {
+                            device.osVersion = "Chromecast";
+                        }
+
                         //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
-                        AppendTextBox(device.ipAddr + " " + device.name + " Up " + " OS version " + device.osVersion + " Mac address" + device.macAddr + System.Environment.NewLine);
+                        AppendTextBox(device.ipAddr + " " + device.name + " Is up " + " OS: " + device.osVersion + " Mac address: " + device.macAddr + " NIC: " + device.Manufacturer + Environment.NewLine + Environment.NewLine);
                         Thread.Sleep(100);
                         count++;
                     }
@@ -214,6 +235,7 @@ namespace MADAM_Server
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                
                 return string.Format("Unknown OS");
             }
         }
