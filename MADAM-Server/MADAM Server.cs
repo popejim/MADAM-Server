@@ -15,6 +15,8 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using RestSharp;
+using System.Management;
+using System.Management.Instrumentation;
 
 namespace MADAM_Server
 {
@@ -69,88 +71,85 @@ namespace MADAM_Server
             }
             
         }
+        private async Task<List<PingReply>> PingAsync(string subnet)
+        {
+            List<string> allip = new List<string>();
+            for (int i = 1; i < 255; i++)
+            {
+                string subnetn = "." + i.ToString();
+                allip.Add(subnet + subnetn);
+                Console.WriteLine(i);
+                
+            }
+            Ping pingSender = new Ping();
+            var tasks = allip.Select(ip => new Ping().SendPingAsync(ip, 100));
+
+            var results = await Task.WhenAll(tasks);
+
+            return results.ToList();
+        }
 
         public async void scan()
         {
             string subnet = txtSubnet.Text;
-
             IPHostEntry ipHostEntry;
             Ping ping;
-            PingReply pingReply;
-            IPAddress addr;
-            
-            int count = 0;
-            if (txtSubnet.Text == "")
-            {
 
-            }
-            else
+            IPAddress addr;
+
+            int count = 0;
+            ping = new Ping();
+            List<PingReply> pingReply = PingAsync(subnet).Result;
+
+            //on successful ping, make new instance of a device
+            foreach (PingReply r in pingReply)
             {
-                //loops for 0-255 
-                for (int i = 15; i < 255; i++)
+                if (r.Status == IPStatus.Success)
                 {
-                    if (hasStarted == false)
+                    try
                     {
-                        break;
-                    }
-                    string subnetn = "." + i.ToString();
-                    ping = new Ping();
-                    pingReply = await ping.SendPingAsync(subnet + subnetn);
-                    
-                    //on successful ping, make new instance of a device
-                    if (pingReply.Status == IPStatus.Success)
-                    {
+                        addr = IPAddress.Parse(r.Address.ToString());
+                        Device device = new Device();
+
                         try
                         {
-                            addr = IPAddress.Parse(subnet + subnetn);
-                            Device device = new Device();
+                            ipHostEntry = Dns.GetHostEntry(addr.ToString());
+                            device.hostName = ipHostEntry.HostName.ToString();
 
-                            try
+                            if (ipHostEntry.HostName.ToString().Contains("."))
                             {
-                                ipHostEntry = Dns.GetHostEntry(addr);
-                                device.hostName = ipHostEntry.HostName.ToString();
-                                if (ipHostEntry.HostName.ToString().Contains("."))
-                                {
-                                    device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
-                                }
-                                else
-                                {
-                                    device.name = device.hostName;
-                                }
+                                device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
                             }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e);
 
-                                device.hostName = "Unkown Device";
-                                device.name = "Unkown Device";
+                            else
+                            {
+                                device.name = device.hostName;
                             }
-                            
-                            device.macAddr = GetMacUsingARP(addr.ToString());
-                            device.Manufacturer = macApiLookup(device.macAddr);
-                            device.ipAddr = addr.ToString();
-                            device.osVersion = getOsVersion(addr.ToString());
-                            //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
-                            AppendTextBox(device.ipAddr + " " + device.name + " Up "  + " OS version " + device.osVersion + " Mac address" + device.macAddr + System.Environment.NewLine);
-                            Thread.Sleep(100);
-                            count ++;
                         }
-
-                        catch
+                        catch (Exception e)
                         {
-                            MessageBox.Show("Uhoh, somenthing broke!", "Scan Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            Console.WriteLine(e);
+                            device.hostName = "Unkown Device";
+                            device.name = "Unkown Device";
                         }
+
+                        device.macAddr = GetMacUsingARP(addr.ToString());
+                        device.Manufacturer = macApiLookup(device.macAddr);
+                        device.ipAddr = addr.ToString();
+                        device.osVersion = getOsVersion(addr.ToString());
+                        //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
+                        AppendTextBox(device.ipAddr + " " + device.name + " Up " + " OS version " + device.osVersion + " Mac address" + device.macAddr + System.Environment.NewLine);
+                        Thread.Sleep(100);
+                        count++;
                     }
-                    Console.WriteLine(i);
 
-                    
-
-                    if (i == 254)
+                    catch
                     {
-                        MessageBox.Show(string.Format("Scan on network {0}.0/24 complete, found {1} devices",subnet,count), "Scan Complete!");
+                        MessageBox.Show("Uhoh, something broke!", "Scan Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
+            MessageBox.Show("Scan Complete");
         }
 
 
@@ -212,8 +211,9 @@ namespace MADAM_Server
                     return string.Format("Name:{0}, Version:{1}", key.GetValue("ProductName"), key.GetValue("CurrentVersion"));
                 }
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return string.Format("Unknown OS");
             }
         }
