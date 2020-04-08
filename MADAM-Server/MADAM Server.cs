@@ -43,15 +43,16 @@ namespace MADAM_Server
         
         
         //returns a mac address by using arp resolution for a given IP address
-        private string GetMacUsingARP(string IPAddr)
+        private string GetMacUsingARP(string ip)
         {
             //IPAddress IP = IPAddress.Parse(IPAddr);
             byte[] macAddr = new byte[6];
             uint macAddrLen = (uint)macAddr.Length;
+            IPAddress ipAddr = IPAddress.Parse(ip);
             try
             {
 
-                if (SendARP(Convert.ToInt32(IPAddr), 0, macAddr, ref macAddrLen) != 0)
+                if (SendARP(BitConverter.ToInt32(ipAddr.GetAddressBytes(),0), 0, macAddr, ref macAddrLen) != 0)
                 {
                     return null;
                     throw new Exception("ARP command failed");
@@ -90,7 +91,6 @@ namespace MADAM_Server
                 string subnetn = "." + i.ToString();
                 allip.Add(subnet + subnetn);
                 Console.WriteLine(i);
-                
             }
             Ping pingSender = new Ping();
             var tasks = allip.Select(ip => new Ping().SendPingAsync(ip, 1000));
@@ -100,7 +100,7 @@ namespace MADAM_Server
             return results.ToList();
         }
 
-        public async void scan()
+        public void scan()
         {
             string subnet = txtSubnet.Text;
             IPHostEntry ipHostEntry;
@@ -124,7 +124,8 @@ namespace MADAM_Server
 
                         try
                         {
-                            //ipHostEntry = Dns.GetHostEntry(addr.ToString());
+                            System.Diagnostics.Process.Start("cmd.exe","/C ipconfig /flushdns");
+                            IPHostEntry ipHostEntry2 = Dns.GetHostByAddress(addr.ToString());
                             ipHostEntry = Dns.GetHostEntry(addr.ToString());
                             device.hostName = ipHostEntry.HostName.ToString();
                             
@@ -171,6 +172,13 @@ namespace MADAM_Server
                 }
             }
             MessageBox.Show("Scan Complete");
+            if (InvokeRequired)
+            {
+                btnScan.BeginInvoke((Action)delegate() { btnScan.Enabled = true; });
+                btnStop.BeginInvoke((Action)delegate () { btnStop.Enabled = false; });
+                hasStarted = false;
+                return;
+            }
         }
 
 
@@ -219,7 +227,6 @@ namespace MADAM_Server
         private void cmbInterfaces_SelectedIndexChanged(object sender, EventArgs e)
         {
             calculateSubnet(subnetList[cmbInterfaces.SelectedIndex], maskList[cmbInterfaces.SelectedIndex]);
-            
         }
 
         private string getOsVersion(string ipAddr)

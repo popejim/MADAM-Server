@@ -38,7 +38,7 @@
             // 
             // btnScan
             // 
-            this.btnScan.Location = new System.Drawing.Point(504, 196);
+            this.btnScan.Location = new System.Drawing.Point(12, 39);
             this.btnScan.Name = "btnScan";
             this.btnScan.Size = new System.Drawing.Size(75, 23);
             this.btnScan.TabIndex = 0;
@@ -48,15 +48,15 @@
             // 
             // txtScanResults
             // 
-            this.txtScanResults.Location = new System.Drawing.Point(504, 283);
+            this.txtScanResults.Location = new System.Drawing.Point(12, 95);
             this.txtScanResults.Multiline = true;
             this.txtScanResults.Name = "txtScanResults";
-            this.txtScanResults.Size = new System.Drawing.Size(258, 146);
+            this.txtScanResults.Size = new System.Drawing.Size(762, 348);
             this.txtScanResults.TabIndex = 1;
             // 
             // txtSubnet
             // 
-            this.txtSubnet.Location = new System.Drawing.Point(548, 257);
+            this.txtSubnet.Location = new System.Drawing.Point(294, 68);
             this.txtSubnet.Name = "txtSubnet";
             this.txtSubnet.Size = new System.Drawing.Size(100, 20);
             this.txtSubnet.TabIndex = 2;
@@ -64,7 +64,7 @@
             // lblSubnet
             // 
             this.lblSubnet.AutoSize = true;
-            this.lblSubnet.Location = new System.Drawing.Point(501, 260);
+            this.lblSubnet.Location = new System.Drawing.Point(247, 71);
             this.lblSubnet.Name = "lblSubnet";
             this.lblSubnet.Size = new System.Drawing.Size(41, 13);
             this.lblSubnet.TabIndex = 3;
@@ -75,7 +75,7 @@
             // 
             this.btnStop.Enabled = false;
             this.btnStop.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.btnStop.Location = new System.Drawing.Point(585, 196);
+            this.btnStop.Location = new System.Drawing.Point(93, 39);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(75, 23);
             this.btnStop.TabIndex = 4;
@@ -86,7 +86,7 @@
             // cmbInterfaces
             // 
             this.cmbInterfaces.FormattingEnabled = true;
-            this.cmbInterfaces.Location = new System.Drawing.Point(504, 230);
+            this.cmbInterfaces.Location = new System.Drawing.Point(11, 68);
             this.cmbInterfaces.Name = "cmbInterfaces";
             this.cmbInterfaces.Size = new System.Drawing.Size(230, 21);
             this.cmbInterfaces.TabIndex = 5;
