@@ -28,6 +28,7 @@ namespace MADAM_Server
         [DllImport("iphlpapi.dll", ExactSpelling = true)]
         public static extern int SendARP(int DestIP, int SrcIP, byte[] pMacAddr, ref uint PhyAddrLen);
 
+        public List<Device> deviceList = new List<Device>(); 
         public bool hasStarted;
         Thread scanThread;
         NetworkInterface[] adapters = new NetworkInterface[10];
@@ -54,13 +55,13 @@ namespace MADAM_Server
 
                 if (SendARP(BitConverter.ToInt32(ipAddr.GetAddressBytes(),0), 0, macAddr, ref macAddrLen) != 0)
                 {
-                    return null;
                     throw new Exception("ARP command failed");
                 }
             }
 
             catch (Exception e)
             {
+                return null;
                 Console.WriteLine(e);
             }
                 string[] str = new string[(int)macAddrLen];
@@ -96,7 +97,7 @@ namespace MADAM_Server
             var tasks = allip.Select(ip => new Ping().SendPingAsync(ip, 1000));
 
             var results = await Task.WhenAll(tasks);
-
+            
             return results.ToList();
         }
 
@@ -124,9 +125,10 @@ namespace MADAM_Server
 
                         try
                         {
+                            
                             System.Diagnostics.Process.Start("cmd.exe","/C ipconfig /flushdns");
-                            IPHostEntry ipHostEntry2 = Dns.GetHostByAddress(addr.ToString());
                             ipHostEntry = Dns.GetHostEntry(addr.ToString());
+                            
                             device.hostName = ipHostEntry.HostName.ToString();
                             
                             if (ipHostEntry.HostName.ToString().Contains("."))
@@ -162,6 +164,7 @@ namespace MADAM_Server
                         //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
                         AppendTextBox(device.ipAddr + " " + device.name + " Is up " + " OS: " + device.osVersion + " Mac address: " + device.macAddr + " NIC: " + device.Manufacturer + Environment.NewLine + Environment.NewLine);
                         Thread.Sleep(100);
+                        deviceList.Add(device);
                         count++;
                     }
 
@@ -291,11 +294,19 @@ namespace MADAM_Server
 
         private string macApiLookup(string mac)
         {
-            var client = new RestClient("https://api.macvendors.com/" + mac);
-            var request = new RestRequest(Method.GET);
-            IRestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
-            return response.Content;
+            if (mac == null)
+            {
+                return "Unknown NIC";
+            }
+
+            else
+            {
+                var client = new RestClient("https://api.macvendors.com/" + mac);
+                var request = new RestRequest(Method.GET);
+                IRestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                return response.Content;
+            }
         }
     }
 }
