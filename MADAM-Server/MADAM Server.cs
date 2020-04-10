@@ -30,15 +30,27 @@ namespace MADAM_Server
 
         public List<Device> deviceList = new List<Device>(); 
         public bool hasStarted;
+
+        public bool listening = true;
         Thread scanThread;
         NetworkInterface[] adapters = new NetworkInterface[10];
         List<string> subnetList = new List<string>();
         List<string> maskList = new List<string>();
+        private Thread _listenThread;
+
+
         public frmMadamServer()
         {
             InitializeComponent();
             GetSubnetMask();
             cmbInterfaces.SelectedIndex = 0;
+            //setup new thread for socket listener
+            _listenThread = new Thread(listenForUdp);
+            _listenThread.Name = "Socket Connection Thread";
+            _listenThread.IsBackground = true;
+            _listenThread.Start();
+
+            
         }
 
         
@@ -312,11 +324,54 @@ namespace MADAM_Server
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            TcpClient client = new TcpClient("192.168.88.11", 42069);
-            NetworkStream stream = client.GetStream();
-            byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("Server Reply");
-            stream.Write(bytesToSend,0,bytesToSend.Length);
-            stream.Close();
+            foreach (var device in deviceList)
+            {
+                try
+                {
+                    TcpClient client = new TcpClient(device.ipAddr, 42069);
+                    NetworkStream stream = client.GetStream();
+                    byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("seek");
+                    stream.Write(bytesToSend, 0, bytesToSend.Length);
+                    stream.Close();
+                }
+
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+
+            }
+
+        }
+
+        private void listenForUdp()
+        {
+            Socket listen = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            IPEndPoint incomingEndPoint = new IPEndPoint(IPAddress.Any, 42069);
+            EndPoint ep = (EndPoint)incomingEndPoint;
+            listen.Bind(incomingEndPoint);
+
+            while (listening == true)
+            {
+
+                byte[] data = new byte[1024];
+                int recv = listen.ReceiveFrom(data, ref ep);
+                string stringData = Encoding.ASCII.GetString(data, 0, recv);
+                string clientIp = ep.ToString();
+                clientIp = clientIp.Substring(0, clientIp.LastIndexOf(":"));
+                Console.WriteLine(stringData);
+
+                if (stringData == "find")
+                {
+                    TcpClient client = new TcpClient(clientIp.ToString(), 42069);
+                    NetworkStream stream = client.GetStream();
+                    byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("here");
+                    stream.Write(bytesToSend, 0, bytesToSend.Length);
+                    stream.Close();
+                    client.Close();
+                }
+            }
+ 
         }
 
         
