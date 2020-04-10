@@ -290,6 +290,7 @@ namespace MADAM_Server
         private void frmMadamServer_Load(object sender, EventArgs e)
         {
 
+
         }
 
         private string macApiLookup(string mac)
@@ -308,5 +309,16 @@ namespace MADAM_Server
                 return response.Content;
             }
         }
+
+        private void btnConnect_Click(object sender, EventArgs e)
+        {
+            TcpClient client = new TcpClient("192.168.88.11", 42069);
+            NetworkStream stream = client.GetStream();
+            byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("Server Reply");
+            stream.Write(bytesToSend,0,bytesToSend.Length);
+            stream.Close();
+        }
+
+        
     }
 }
