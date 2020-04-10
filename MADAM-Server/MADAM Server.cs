@@ -73,8 +73,9 @@ namespace MADAM_Server
 
             catch (Exception e)
             {
-                return null;
+
                 Console.WriteLine(e);
+                return null;
             }
                 string[] str = new string[(int)macAddrLen];
 
