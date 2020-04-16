@@ -1,6 +1,6 @@
 ﻿namespace MADAM_Server
 {
-    partial class frmMadamServer
+    partial class frmMadamServerScan
     {
         /// <summary>
         /// Required designer variable.
@@ -39,7 +39,7 @@
             // 
             // btnScan
             // 
-            this.btnScan.Location = new System.Drawing.Point(12, 20);
+            this.btnScan.Location = new System.Drawing.Point(406, 15);
             this.btnScan.Name = "btnScan";
             this.btnScan.Size = new System.Drawing.Size(75, 24);
             this.btnScan.TabIndex = 0;
@@ -49,15 +49,15 @@
             // 
             // txtScanResults
             // 
-            this.txtScanResults.Location = new System.Drawing.Point(12, 107);
+            this.txtScanResults.Location = new System.Drawing.Point(406, 102);
             this.txtScanResults.Multiline = true;
             this.txtScanResults.Name = "txtScanResults";
-            this.txtScanResults.Size = new System.Drawing.Size(762, 336);
+            this.txtScanResults.Size = new System.Drawing.Size(382, 336);
             this.txtScanResults.TabIndex = 1;
             // 
             // txtSubnet
             // 
-            this.txtSubnet.Location = new System.Drawing.Point(294, 68);
+            this.txtSubnet.Location = new System.Drawing.Point(688, 63);
             this.txtSubnet.Name = "txtSubnet";
             this.txtSubnet.Size = new System.Drawing.Size(100, 20);
             this.txtSubnet.TabIndex = 2;
@@ -65,7 +65,7 @@
             // lblSubnet
             // 
             this.lblSubnet.AutoSize = true;
-            this.lblSubnet.Location = new System.Drawing.Point(247, 71);
+            this.lblSubnet.Location = new System.Drawing.Point(641, 66);
             this.lblSubnet.Name = "lblSubnet";
             this.lblSubnet.Size = new System.Drawing.Size(41, 13);
             this.lblSubnet.TabIndex = 3;
@@ -76,7 +76,7 @@
             // 
             this.btnStop.Enabled = false;
             this.btnStop.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.btnStop.Location = new System.Drawing.Point(12, 50);
+            this.btnStop.Location = new System.Drawing.Point(406, 45);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(75, 24);
             this.btnStop.TabIndex = 4;
@@ -87,7 +87,7 @@
             // cmbInterfaces
             // 
             this.cmbInterfaces.FormattingEnabled = true;
-            this.cmbInterfaces.Location = new System.Drawing.Point(11, 80);
+            this.cmbInterfaces.Location = new System.Drawing.Point(405, 75);
             this.cmbInterfaces.Name = "cmbInterfaces";
             this.cmbInterfaces.Size = new System.Drawing.Size(230, 21);
             this.cmbInterfaces.TabIndex = 5;
@@ -95,7 +95,7 @@
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(93, 20);
+            this.btnConnect.Location = new System.Drawing.Point(487, 15);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(87, 54);
             this.btnConnect.TabIndex = 6;
@@ -103,7 +103,7 @@
             this.btnConnect.UseVisualStyleBackColor = true;
             this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
-            // frmMadamServer
+            // frmMadamServerScan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -115,7 +115,7 @@
             this.Controls.Add(this.txtSubnet);
             this.Controls.Add(this.txtScanResults);
             this.Controls.Add(this.btnScan);
-            this.Name = "frmMadamServer";
+            this.Name = "frmMadamServerScan";
             this.Text = "MADAM Server";
             this.Load += new System.EventHandler(this.frmMadamServer_Load);
             this.ResumeLayout(false);

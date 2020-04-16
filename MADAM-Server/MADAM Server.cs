@@ -22,7 +22,7 @@ namespace MADAM_Server
 {
     //server application for MADAM msp documentation. This sits on a companies windows server and reports back
     //to the central server. Detects network interfaces, uses netmask from this to scan correct subnets.
-    public partial class frmMadamServer : Form
+    public partial class frmMadamServerScan : Form
     {
         //imports dll for using arp resolution
         [DllImport("iphlpapi.dll", ExactSpelling = true)]
@@ -39,7 +39,7 @@ namespace MADAM_Server
         private Thread _listenThread;
 
 
-        public frmMadamServer()
+        public frmMadamServerScan()
         {
             InitializeComponent();
             GetSubnetMask();
@@ -265,7 +265,6 @@ namespace MADAM_Server
 
         private void calculateSubnet(string ipAddress, string subNetMask)
         {
-
             string[] ipOct = ipAddress.Split('.');
             string[] snOct = subNetMask.Split('.');
 
