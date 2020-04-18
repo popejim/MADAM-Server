@@ -27,10 +27,8 @@ namespace MADAM_Server
         //imports dll for using arp resolution
         [DllImport("iphlpapi.dll", ExactSpelling = true)]
         public static extern int SendARP(int DestIP, int SrcIP, byte[] pMacAddr, ref uint PhyAddrLen);
-
         public List<Device> deviceList = new List<Device>(); 
         public bool hasStarted;
-
         public bool listening = true;
         Thread scanThread;
         NetworkInterface[] adapters = new NetworkInterface[10];
@@ -49,11 +47,7 @@ namespace MADAM_Server
             _listenThread.Name = "Socket Connection Thread";
             _listenThread.IsBackground = true;
             _listenThread.Start();
-
-            
         }
-
-        
         
         //returns a mac address by using arp resolution for a given IP address
         private string GetMacUsingARP(string ip)
@@ -78,10 +72,7 @@ namespace MADAM_Server
                 return null;
             }
                 string[] str = new string[(int)macAddrLen];
-
-                for (int i = 0; i < macAddrLen; i++)
-                    str[i] = macAddr[i].ToString("x2");
-
+                for (int i = 0; i < macAddrLen; i++)str[i] = macAddr[i].ToString("x2");
                 return string.Join(":", str);
         }
         private void btnScan_Click(object sender, EventArgs e)
@@ -108,9 +99,7 @@ namespace MADAM_Server
             }
             Ping pingSender = new Ping();
             var tasks = allip.Select(ip => new Ping().SendPingAsync(ip, 1000));
-
             var results = await Task.WhenAll(tasks);
-            
             return results.ToList();
         }
 
@@ -119,9 +108,7 @@ namespace MADAM_Server
             string subnet = txtSubnet.Text;
             IPHostEntry ipHostEntry;
             Ping ping;
-
             IPAddress addr;
-
             int count = 0;
             ping = new Ping();
             List<PingReply> pingReply = PingAsync(subnet).Result;
@@ -196,15 +183,14 @@ namespace MADAM_Server
                 return;
             }
         }
-
-
+        
         private void btnStop_Click(object sender, EventArgs e)
         {
             hasStarted = false;
             btnStop.Enabled = false;
             btnScan.Enabled = true;
-
         }
+
         public void AppendTextBox(string value)
         {
             if (InvokeRequired)
@@ -340,9 +326,7 @@ namespace MADAM_Server
                 {
                     Console.WriteLine(ex);
                 }
-
             }
-
         }
 
         private void listenForUdp()
