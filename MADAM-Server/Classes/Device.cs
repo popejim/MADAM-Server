@@ -14,6 +14,5 @@ namespace MADAM_Server.Classes
         public string hostName { get; set; }
         public string osVersion { get; set; }
         public string Manufacturer { get; set; }
-    
     }
 }

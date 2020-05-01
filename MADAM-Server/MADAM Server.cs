@@ -67,7 +67,6 @@ namespace MADAM_Server
 
             catch (Exception e)
             {
-
                 Console.WriteLine(e);
                 return null;
             }
@@ -288,8 +287,6 @@ namespace MADAM_Server
 
         private void frmMadamServer_Load(object sender, EventArgs e)
         {
-
-
         }
 
         private string macApiLookup(string mac)
@@ -345,6 +342,7 @@ namespace MADAM_Server
                 string clientIp = ep.ToString();
                 clientIp = clientIp.Substring(0, clientIp.LastIndexOf(":"));
                 Console.WriteLine(stringData);
+                AppendTextBox(stringData);
 
                 if (stringData == "find")
                 {
@@ -354,6 +352,7 @@ namespace MADAM_Server
                     stream.Write(bytesToSend, 0, bytesToSend.Length);
                     stream.Close();
                     client.Close();
+                    //listenForUdp();
                 }
             }
  
