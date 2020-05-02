@@ -16,7 +16,7 @@ namespace MADAM_Server
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmMadamServerScan());
+            Application.Run(new frmMainMenu());
         }
     }
 }

@@ -19,7 +19,20 @@ namespace MADAM_Server
 
         private void frmMainMenu_Load(object sender, EventArgs e)
         {
+            
+        }
 
+        public void ListenForCentral()
+        {
+
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Enabled = false;
+            Form frmSettings = new frmSettings();
+            frmSettings.ShowDialog();
+            this.Enabled = true;
         }
     }
 }
