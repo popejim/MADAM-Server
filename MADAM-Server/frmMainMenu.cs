@@ -34,7 +34,8 @@ namespace MADAM_Server
         {
             //make endpoint for listener on localhost, uses port 42069
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress localIp = host.AddressList[0];
+            IPAddress localIP = host.AddressList.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
+
             IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, 42069);
 
             //Make TCP/IP socket
@@ -74,11 +75,22 @@ namespace MADAM_Server
             IPAddress remoteAddress = ((IPEndPoint)handler.RemoteEndPoint).Address;
             TcpClient client = new TcpClient(remoteAddress.ToString(), 42069);
             NetworkStream stream = client.GetStream();
+            Thread.Sleep(2000);
             byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("Server");
             stream.Write(bytesToSend, 0, bytesToSend.Length);
             stream.Close();
             client.Close();
-            _connectThread.Abort();
+            _connectThread.Abort(); 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            frmMadamServerScan frmscan = new frmMadamServerScan();
+            frmscan.Show();
+            _connectThread = new Thread(ListenForCentral);
+            _connectThread.Name = "Socket Connection Thread";
+            _connectThread.IsBackground = true;
+            _connectThread.Start();
         }
     }
 }

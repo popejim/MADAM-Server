@@ -351,7 +351,8 @@ namespace MADAM_Server
                     stream.Write(bytesToSend, 0, bytesToSend.Length);
                     stream.Close();
                     client.Close();
-                    //listenForUdp();
+                    listen.Close();
+                    listenForUdp();
                 }
             }
  
