@@ -16,6 +16,10 @@ namespace MADAM_Server
 {
     public partial class frmMainMenu : Form
     {
+
+        volatile int keepGoing = 1;
+        public bool listening = true;
+        public Socket listen;
         private Thread _connectThread;
         public frmMainMenu()
         {
@@ -39,18 +43,22 @@ namespace MADAM_Server
             IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, 42069);
 
             //Make TCP/IP socket
-            Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            listen = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             try
             {
-                listener.Bind(localEndPoint);
-                listener.Listen(100);
-                int keepGoing = 1;
-                while (keepGoing == 1)
+                listen.Bind(localEndPoint);
+                listen.Listen(100);
+                while (listening == true)
                 {
-                    listener.BeginAccept(new AsyncCallback(ReplyToCentral), listener);
-                    Thread.Sleep(60000);
-                }
+                    listen.BeginAccept(new AsyncCallback(ReplyToCentral), listen);
+                }      
+
+                
+                
+                return;
+                //code to do after replying
+                
             }
 
             catch (Exception e)
@@ -80,13 +88,13 @@ namespace MADAM_Server
             stream.Write(bytesToSend, 0, bytesToSend.Length);
             stream.Close();
             client.Close();
-            _connectThread.Abort(); 
+            listening = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             frmMadamServerScan frmscan = new frmMadamServerScan();
-            frmscan.Show();
+            frmscan.Show(); 
             _connectThread = new Thread(ListenForCentral);
             _connectThread.Name = "Socket Connection Thread";
             _connectThread.IsBackground = true;

@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Classes\Device.cs" />
     <Compile Include="Classes\Settings.cs" />
+    <Compile Include="Classes\Users.cs" />
     <Compile Include="frmMainMenu.cs">
       <SubType>Form</SubType>
     </Compile>
