@@ -54,5 +54,18 @@ namespace MADAM_Server
             MessageBox.Show("Settings Saved", "Settings Saved");
             this.Close();
         }
+
+        private void frmSettings_Load(object sender, EventArgs e)
+        {
+            Settings settings;
+
+            XmlSerializer mySerializer = new XmlSerializer(typeof(Settings));
+            using (FileStream myFileStream = new FileStream(savePath + "\\MADAMServer\\Settings.XML", FileMode.Open))
+            {
+                settings = (Settings)mySerializer.Deserialize(myFileStream);
+                txtControlIP.Text = settings.controlIP;
+                myFileStream.Close();
+            }
+        }
     }
 }

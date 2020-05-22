@@ -11,6 +11,8 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using MADAM_Server.Classes;
+using System.Xml.Serialization;
 
 namespace MADAM_Server
 {
@@ -32,6 +34,24 @@ namespace MADAM_Server
             _connectThread.Name = "Socket Connection Thread";
             _connectThread.IsBackground = true;
             _connectThread.Start();
+
+            List<Device> currentDevices = GetDevices();
+            foreach (Device d in currentDevices)
+            {
+                lstDevices.Items.Add(d.name);
+            }
+        }
+
+        public List<Device> GetDevices()
+        {
+            List<Device> returnList;
+            string savePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+            XmlSerializer mySerializer = new XmlSerializer(typeof(List<Device>));
+            StreamReader myReader = new StreamReader(savePath + "\\MADAMServer\\Devices.XML");
+
+            returnList = (List<Device>)mySerializer.Deserialize(myReader);
+                return returnList;
             
         }
 
@@ -99,6 +119,11 @@ namespace MADAM_Server
             _connectThread.Name = "Socket Connection Thread";
             _connectThread.IsBackground = true;
             _connectThread.Start();
+        }
+
+        private void performNewScanToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            button1_Click(this, e);
         }
     }
 }

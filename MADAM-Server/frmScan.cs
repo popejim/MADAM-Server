@@ -37,7 +37,7 @@ namespace MADAM_Server
         List<string> subnetList = new List<string>();
         List<string> maskList = new List<string>();
         private Thread _listenThread;
-
+        public bool hasClosed;
 
         public frmMadamServerScan()
         {
@@ -48,7 +48,7 @@ namespace MADAM_Server
             _listenThread = new Thread(listenForUdp);
             _listenThread.Name = "Socket Connection Thread";
             _listenThread.IsBackground = true;
-            _listenThread.Start();
+            //_listenThread.Start();
         }
         
         //returns a mac address by using arp resolution for a given IP address
@@ -332,14 +332,17 @@ namespace MADAM_Server
 
         private void listenForUdp()
         {
+
             Socket listen = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint incomingEndPoint = new IPEndPoint(IPAddress.Any, 42069);
             EndPoint ep = (EndPoint)incomingEndPoint;
-            listen.Bind(incomingEndPoint);
-
+            if (listen.IsBound == false)
+            {
+                listen.Bind(incomingEndPoint);
+            }
+            
             while (listening == true)
             {
-
                 byte[] data = new byte[1024];
                 int recv = listen.ReceiveFrom(data, ref ep);
                 string stringData = Encoding.ASCII.GetString(data, 0, recv);
@@ -357,11 +360,13 @@ namespace MADAM_Server
                     stream.Close();
                     client.Close();
                     listen.Close();
-                    listenForUdp();
                 }
             }
- 
         }
-        
+
+        private void frmMadamServerScan_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _listenThread.Abort();
+        }
     }
 }

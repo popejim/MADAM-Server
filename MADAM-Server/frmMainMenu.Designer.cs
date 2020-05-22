@@ -36,6 +36,7 @@
             this.btnScan = new System.Windows.Forms.Button();
             this.btnClientUpdate = new System.Windows.Forms.Button();
             this.lstDevices = new System.Windows.Forms.ListBox();
+            this.performNewScanToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -46,7 +47,7 @@
             this.scanToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(872, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(552, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -74,17 +75,19 @@
             // 
             // scanToolStripMenuItem
             // 
+            this.scanToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.performNewScanToolStripMenuItem});
             this.scanToolStripMenuItem.Name = "scanToolStripMenuItem";
             this.scanToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.scanToolStripMenuItem.Text = "Scan";
             // 
             // btnScan
             // 
-            this.btnScan.Location = new System.Drawing.Point(12, 386);
+            this.btnScan.Location = new System.Drawing.Point(12, 39);
             this.btnScan.Name = "btnScan";
-            this.btnScan.Size = new System.Drawing.Size(75, 23);
+            this.btnScan.Size = new System.Drawing.Size(75, 51);
             this.btnScan.TabIndex = 1;
-            this.btnScan.Text = "Scan";
+            this.btnScan.Text = "Perform New Scan";
             this.btnScan.UseVisualStyleBackColor = true;
             this.btnScan.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -92,9 +95,9 @@
             // 
             this.btnClientUpdate.Location = new System.Drawing.Point(12, 431);
             this.btnClientUpdate.Name = "btnClientUpdate";
-            this.btnClientUpdate.Size = new System.Drawing.Size(75, 48);
+            this.btnClientUpdate.Size = new System.Drawing.Size(88, 48);
             this.btnClientUpdate.TabIndex = 2;
-            this.btnClientUpdate.Text = "Force Client Update";
+            this.btnClientUpdate.Text = "Check For Client Update";
             this.btnClientUpdate.UseVisualStyleBackColor = true;
             // 
             // lstDevices
@@ -105,11 +108,18 @@
             this.lstDevices.Size = new System.Drawing.Size(352, 433);
             this.lstDevices.TabIndex = 3;
             // 
+            // performNewScanToolStripMenuItem
+            // 
+            this.performNewScanToolStripMenuItem.Name = "performNewScanToolStripMenuItem";
+            this.performNewScanToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.performNewScanToolStripMenuItem.Text = "Perform New Scan";
+            this.performNewScanToolStripMenuItem.Click += new System.EventHandler(this.performNewScanToolStripMenuItem_Click);
+            // 
             // frmMainMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(872, 510);
+            this.ClientSize = new System.Drawing.Size(552, 510);
             this.Controls.Add(this.lstDevices);
             this.Controls.Add(this.btnClientUpdate);
             this.Controls.Add(this.btnScan);
@@ -135,5 +145,6 @@
         private System.Windows.Forms.Button btnScan;
         private System.Windows.Forms.Button btnClientUpdate;
         private System.Windows.Forms.ListBox lstDevices;
+        private System.Windows.Forms.ToolStripMenuItem performNewScanToolStripMenuItem;
     }
 }

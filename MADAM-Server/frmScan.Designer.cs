@@ -38,7 +38,7 @@
             // 
             // btnScan
             // 
-            this.btnScan.Location = new System.Drawing.Point(406, 15);
+            this.btnScan.Location = new System.Drawing.Point(12, 15);
             this.btnScan.Name = "btnScan";
             this.btnScan.Size = new System.Drawing.Size(75, 24);
             this.btnScan.TabIndex = 0;
@@ -48,7 +48,7 @@
             // 
             // txtScanResults
             // 
-            this.txtScanResults.Location = new System.Drawing.Point(406, 102);
+            this.txtScanResults.Location = new System.Drawing.Point(12, 102);
             this.txtScanResults.Multiline = true;
             this.txtScanResults.Name = "txtScanResults";
             this.txtScanResults.Size = new System.Drawing.Size(382, 336);
@@ -56,7 +56,7 @@
             // 
             // txtSubnet
             // 
-            this.txtSubnet.Location = new System.Drawing.Point(688, 63);
+            this.txtSubnet.Location = new System.Drawing.Point(294, 75);
             this.txtSubnet.Name = "txtSubnet";
             this.txtSubnet.Size = new System.Drawing.Size(100, 20);
             this.txtSubnet.TabIndex = 2;
@@ -64,7 +64,7 @@
             // lblSubnet
             // 
             this.lblSubnet.AutoSize = true;
-            this.lblSubnet.Location = new System.Drawing.Point(641, 66);
+            this.lblSubnet.Location = new System.Drawing.Point(247, 78);
             this.lblSubnet.Name = "lblSubnet";
             this.lblSubnet.Size = new System.Drawing.Size(41, 13);
             this.lblSubnet.TabIndex = 3;
@@ -75,7 +75,7 @@
             // 
             this.btnStop.Enabled = false;
             this.btnStop.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.btnStop.Location = new System.Drawing.Point(406, 45);
+            this.btnStop.Location = new System.Drawing.Point(12, 45);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(75, 24);
             this.btnStop.TabIndex = 4;
@@ -86,7 +86,7 @@
             // cmbInterfaces
             // 
             this.cmbInterfaces.FormattingEnabled = true;
-            this.cmbInterfaces.Location = new System.Drawing.Point(405, 75);
+            this.cmbInterfaces.Location = new System.Drawing.Point(11, 75);
             this.cmbInterfaces.Name = "cmbInterfaces";
             this.cmbInterfaces.Size = new System.Drawing.Size(230, 21);
             this.cmbInterfaces.TabIndex = 5;
@@ -96,7 +96,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(404, 450);
             this.Controls.Add(this.cmbInterfaces);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.lblSubnet);
@@ -105,6 +105,7 @@
             this.Controls.Add(this.btnScan);
             this.Name = "frmMadamServerScan";
             this.Text = "MADAM Server";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMadamServerScan_FormClosing);
             this.Load += new System.EventHandler(this.frmMadamServer_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

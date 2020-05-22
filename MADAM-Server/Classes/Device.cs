@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace MADAM_Server.Classes
-{
+{   [Serializable, XmlRoot("Device")]
     public class Device
     {
         public string name { get; set; }
