@@ -34,7 +34,6 @@
             this.lblSubnet = new System.Windows.Forms.Label();
             this.btnStop = new System.Windows.Forms.Button();
             this.cmbInterfaces = new System.Windows.Forms.ComboBox();
-            this.btnConnect = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnScan
@@ -93,22 +92,11 @@
             this.cmbInterfaces.TabIndex = 5;
             this.cmbInterfaces.SelectedIndexChanged += new System.EventHandler(this.cmbInterfaces_SelectedIndexChanged);
             // 
-            // btnConnect
-            // 
-            this.btnConnect.Location = new System.Drawing.Point(487, 15);
-            this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(87, 54);
-            this.btnConnect.TabIndex = 6;
-            this.btnConnect.Text = "Connect to clients";
-            this.btnConnect.UseVisualStyleBackColor = true;
-            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
-            // 
             // frmMadamServerScan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.cmbInterfaces);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.lblSubnet);
@@ -131,7 +119,6 @@
         private System.Windows.Forms.Label lblSubnet;
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.ComboBox cmbInterfaces;
-        private System.Windows.Forms.Button btnConnect;
     }
 }
 

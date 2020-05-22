@@ -32,6 +32,7 @@ namespace MADAM_Server
             _connectThread.Name = "Socket Connection Thread";
             _connectThread.IsBackground = true;
             _connectThread.Start();
+            
         }
 
         public void ListenForCentral()
@@ -40,7 +41,7 @@ namespace MADAM_Server
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
             IPAddress localIP = host.AddressList.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
 
-            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, 42069);
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, 42070);
 
             //Make TCP/IP socket
             listen = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -83,7 +84,6 @@ namespace MADAM_Server
             IPAddress remoteAddress = ((IPEndPoint)handler.RemoteEndPoint).Address;
             TcpClient client = new TcpClient(remoteAddress.ToString(), 42069);
             NetworkStream stream = client.GetStream();
-            Thread.Sleep(2000);
             byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("Server");
             stream.Write(bytesToSend, 0, bytesToSend.Length);
             stream.Close();

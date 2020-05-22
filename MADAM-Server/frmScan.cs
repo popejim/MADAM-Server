@@ -17,6 +17,8 @@ using Microsoft.Win32;
 using RestSharp;
 using System.Management;
 using System.Management.Instrumentation;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace MADAM_Server
 {
@@ -174,6 +176,7 @@ namespace MADAM_Server
                 }
             }
             MessageBox.Show("Scan Complete");
+            SaveDevices(deviceList);
             if (InvokeRequired)
             {
                 btnScan.BeginInvoke((Action)delegate() { btnScan.Enabled = true; });
@@ -183,6 +186,28 @@ namespace MADAM_Server
             }
         }
         
+        private void SaveDevices(List<Device>listIn)
+        {
+            string savePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+     
+                XmlSerializer mySerializer = new XmlSerializer(typeof(List<Device>));
+                if (Directory.Exists(savePath + "\\MADAMServer\\"))
+                {
+                    StreamWriter myWriter = new StreamWriter(savePath + "\\MADAMServer\\Devices.XML");
+                    mySerializer.Serialize(myWriter, listIn);
+                    myWriter.Close();
+                }
+
+                else
+                {
+                    Directory.CreateDirectory(savePath + "\\MADAMServer\\");
+                    StreamWriter myWriter = new StreamWriter(savePath + "\\MADAMServer\\Devices.XML");
+                    mySerializer.Serialize(myWriter, listIn);
+                    myWriter.Close();
+                }
+            
+            
+        }
         private void btnStop_Click(object sender, EventArgs e)
         {
             hasStarted = false;
@@ -305,26 +330,6 @@ namespace MADAM_Server
             }
         }
 
-        private void btnConnect_Click(object sender, EventArgs e)
-        {
-            foreach (var device in deviceList)
-            {
-                try
-                {
-                    TcpClient client = new TcpClient(device.ipAddr, 42069);
-                    NetworkStream stream = client.GetStream();
-                    byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("seek");
-                    stream.Write(bytesToSend, 0, bytesToSend.Length);
-                    stream.Close();
-                }
-
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-            }
-        }
-
         private void listenForUdp()
         {
             Socket listen = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -357,9 +362,6 @@ namespace MADAM_Server
             }
  
         }
-
-
-
         
     }
 }
