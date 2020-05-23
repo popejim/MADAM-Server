@@ -19,6 +19,7 @@ using System.Management;
 using System.Management.Instrumentation;
 using System.Xml.Serialization;
 using System.IO;
+using System.DirectoryServices.ActiveDirectory;
 
 namespace MADAM_Server
 {
@@ -113,7 +114,18 @@ namespace MADAM_Server
             int count = 0;
             ping = new Ping();
             List<PingReply> pingReply = PingAsync(subnet).Result;
-
+            Domain local;
+            bool isDomain;
+            try
+            {
+                local = Domain.GetComputerDomain();
+                isDomain = true;
+            }
+            catch
+            {
+                isDomain = false;
+            }
+                                
             //on successful ping, make new instance of a device
             foreach (PingReply r in pingReply)
             {
@@ -161,7 +173,10 @@ namespace MADAM_Server
                         {
                             device.osVersion = "Chromecast";
                         }
-
+                        if (isDomain == true)
+                        {
+                            local.FindDomainController();
+                        }
                         //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
                         AppendTextBox(device.ipAddr + " " + device.name + " Is up " + " OS: " + device.osVersion + " Mac address: " + device.macAddr + " NIC: " + device.Manufacturer + Environment.NewLine + Environment.NewLine);
                         Thread.Sleep(100);
