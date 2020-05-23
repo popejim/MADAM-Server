@@ -211,6 +211,7 @@ namespace MADAM_Server
         private void btnStop_Click(object sender, EventArgs e)
         {
             hasStarted = false;
+            
             btnStop.Enabled = false;
             btnScan.Enabled = true;
         }

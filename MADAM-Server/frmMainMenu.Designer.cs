@@ -33,10 +33,10 @@
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scanToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.performNewScanToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnScan = new System.Windows.Forms.Button();
             this.btnClientUpdate = new System.Windows.Forms.Button();
             this.lstDevices = new System.Windows.Forms.ListBox();
-            this.performNewScanToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -81,6 +81,13 @@
             this.scanToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.scanToolStripMenuItem.Text = "Scan";
             // 
+            // performNewScanToolStripMenuItem
+            // 
+            this.performNewScanToolStripMenuItem.Name = "performNewScanToolStripMenuItem";
+            this.performNewScanToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.performNewScanToolStripMenuItem.Text = "Perform New Scan";
+            this.performNewScanToolStripMenuItem.Click += new System.EventHandler(this.performNewScanToolStripMenuItem_Click);
+            // 
             // btnScan
             // 
             this.btnScan.Location = new System.Drawing.Point(12, 39);
@@ -99,6 +106,7 @@
             this.btnClientUpdate.TabIndex = 2;
             this.btnClientUpdate.Text = "Check For Client Update";
             this.btnClientUpdate.UseVisualStyleBackColor = true;
+            this.btnClientUpdate.Click += new System.EventHandler(this.btnClientUpdate_Click);
             // 
             // lstDevices
             // 
@@ -107,13 +115,6 @@
             this.lstDevices.Name = "lstDevices";
             this.lstDevices.Size = new System.Drawing.Size(352, 433);
             this.lstDevices.TabIndex = 3;
-            // 
-            // performNewScanToolStripMenuItem
-            // 
-            this.performNewScanToolStripMenuItem.Name = "performNewScanToolStripMenuItem";
-            this.performNewScanToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.performNewScanToolStripMenuItem.Text = "Perform New Scan";
-            this.performNewScanToolStripMenuItem.Click += new System.EventHandler(this.performNewScanToolStripMenuItem_Click);
             // 
             // frmMainMenu
             // 

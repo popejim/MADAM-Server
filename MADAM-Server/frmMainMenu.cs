@@ -19,7 +19,6 @@ namespace MADAM_Server
     public partial class frmMainMenu : Form
     {
 
-        volatile int keepGoing = 1;
         public bool listening = true;
         public Socket listen;
         private Thread _connectThread;
@@ -36,23 +35,33 @@ namespace MADAM_Server
             _connectThread.Start();
 
             List<Device> currentDevices = GetDevices();
-            foreach (Device d in currentDevices)
+            if (currentDevices != null)
             {
-                lstDevices.Items.Add(d.name);
+                foreach (Device d in currentDevices)
+                {
+                    lstDevices.Items.Add(d.name);
+                }
             }
+
         }
 
         public List<Device> GetDevices()
         {
-            List<Device> returnList;
-            string savePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            try
+            {
+                List<Device> returnList;
+                string savePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-            XmlSerializer mySerializer = new XmlSerializer(typeof(List<Device>));
-            StreamReader myReader = new StreamReader(savePath + "\\MADAMServer\\Devices.XML");
-
-            returnList = (List<Device>)mySerializer.Deserialize(myReader);
+                XmlSerializer mySerializer = new XmlSerializer(typeof(List<Device>));
+                StreamReader myReader = new StreamReader(savePath + "\\MADAMServer\\Devices.XML");
+                myReader.Close();
+                returnList = (List<Device>)mySerializer.Deserialize(myReader);
                 return returnList;
-            
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public void ListenForCentral()
@@ -70,17 +79,8 @@ namespace MADAM_Server
             {
                 listen.Bind(localEndPoint);
                 listen.Listen(100);
-                while (listening == true)
-                {
-                    listen.BeginAccept(new AsyncCallback(ReplyToCentral), listen);
-                }      
-
-                
-                
-                return;
-                //code to do after replying
-                
-            }
+                listen.BeginAccept(new AsyncCallback(ReplyToCentral), listen);
+           }
 
             catch (Exception e)
             {
@@ -124,6 +124,11 @@ namespace MADAM_Server
         private void performNewScanToolStripMenuItem_Click(object sender, EventArgs e)
         {
             button1_Click(this, e);
+        }
+
+        private void btnClientUpdate_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
