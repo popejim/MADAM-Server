@@ -20,6 +20,7 @@ using System.Management.Instrumentation;
 using System.Xml.Serialization;
 using System.IO;
 using System.DirectoryServices.ActiveDirectory;
+using System.DirectoryServices;
 
 namespace MADAM_Server
 {
@@ -93,7 +94,7 @@ namespace MADAM_Server
         private async Task<List<PingReply>> PingAsync(string subnet)
         {
             List<string> allip = new List<string>();
-            for (int i = 1; i < 255; i++)
+            for (int i = 68; i < 70; i++)
             {
                 string subnetn = "." + i.ToString();
                 allip.Add(subnet + subnetn);
@@ -115,17 +116,6 @@ namespace MADAM_Server
             ping = new Ping();
             List<PingReply> pingReply = PingAsync(subnet).Result;
             Domain local;
-            bool isDomain;
-            try
-            {
-                local = Domain.GetComputerDomain();
-                isDomain = true;
-            }
-            catch
-            {
-                local = null; 
-                isDomain = false;
-            }
                                 
             //on successful ping, make new instance of a device
             foreach (PingReply r in pingReply)
@@ -166,6 +156,7 @@ namespace MADAM_Server
                         device.Manufacturer = macApiLookup(device.macAddr);
                         device.ipAddr = addr.ToString();
                         device.osVersion = getOsVersion(addr.ToString());
+                        device.isAd = checkAD(addr.ToString());
                         if (device.Manufacturer.Contains("HUAWEI"))
                         {
                             device.osVersion = "Android OS";
@@ -173,10 +164,6 @@ namespace MADAM_Server
                         else if (device.Manufacturer.Contains("Google"))
                         {
                             device.osVersion = "Chromecast";
-                        }
-                        if (isDomain == true)
-                        {
-                            local.FindDomainController();
                         }
                         //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
                         AppendTextBox(device.ipAddr + " " + device.name + " Is up " + " OS: " + device.osVersion + " Mac address: " + device.macAddr + " NIC: " + device.Manufacturer + Environment.NewLine + Environment.NewLine);
@@ -272,8 +259,31 @@ namespace MADAM_Server
             calculateSubnet(subnetList[cmbInterfaces.SelectedIndex], maskList[cmbInterfaces.SelectedIndex]);
         }
 
+        private bool checkAD(string ipaddr)
+        {
+            //tests for an ad connection by making a simple query. If it causes an exception, returns false as no ad
+            try
+            {
+                DirectoryEntry entry = new DirectoryEntry("LDAP://192.168.88.69","MADAM","Test123");
+                DirectorySearcher mySearcher = new DirectorySearcher(entry);
+                mySearcher.Filter = ("(objectClass=computer)");
+                Console.WriteLine("Listing of computers in the Active Directory");
+                Console.WriteLine("============================================"); foreach (SearchResult resEnt in mySearcher.FindAll())
+                {
+                    Console.WriteLine(resEnt.GetDirectoryEntry().Name.ToString());
+                }
+                Console.WriteLine("=========== End of Listing =============");
+                return true;
+            }
+            catch (Exception e)
+            {
+
+                return false;
+            }
+        }
         private string getOsVersion(string ipAddr)
         {
+            //uses remote registry to get the version of windows if one exists
             try
             {
                 using (var reg = RegistryKey.OpenRemoteBaseKey(RegistryHive.LocalMachine, ipAddr))
@@ -292,6 +302,7 @@ namespace MADAM_Server
 
         private void calculateSubnet(string ipAddress, string subNetMask)
         {
+            //calculates a subnet based off the ip address and subnet mask
             string[] ipOct = ipAddress.Split('.');
             string[] snOct = subNetMask.Split('.');
 
