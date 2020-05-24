@@ -165,6 +165,10 @@ namespace MADAM_Server
                         {
                             device.osVersion = "Chromecast";
                         }
+                        if (device.isAd == true)
+                        {
+                            Util.ADMethods.getUsers(addr.ToString());
+                        }
                         //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
                         AppendTextBox(device.ipAddr + " " + device.name + " Is up " + " OS: " + device.osVersion + " Mac address: " + device.macAddr + " NIC: " + device.Manufacturer + Environment.NewLine + Environment.NewLine);
                         Thread.Sleep(100);
@@ -187,6 +191,7 @@ namespace MADAM_Server
                 hasStarted = false;
                 return;
             }
+
         }
         
         private void SaveDevices(List<Device>listIn)
