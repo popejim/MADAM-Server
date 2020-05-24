@@ -123,6 +123,7 @@ namespace MADAM_Server
             }
             catch
             {
+                local = null; 
                 isDomain = false;
             }
                                 

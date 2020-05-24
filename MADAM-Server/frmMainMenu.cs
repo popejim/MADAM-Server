@@ -54,8 +54,9 @@ namespace MADAM_Server
 
                 XmlSerializer mySerializer = new XmlSerializer(typeof(List<Device>));
                 StreamReader myReader = new StreamReader(savePath + "\\MADAMServer\\Devices.XML");
-                myReader.Close();
+                
                 returnList = (List<Device>)mySerializer.Deserialize(myReader);
+                myReader.Close();
                 return returnList;
             }
             catch
