@@ -115,7 +115,8 @@ namespace MADAM_Server
         private void button1_Click(object sender, EventArgs e)
         {
             frmMadamServerScan frmscan = new frmMadamServerScan();
-            frmscan.Show(); 
+            frmscan.Show();
+            this.Hide(); 
             _connectThread = new Thread(ListenForCentral);
             _connectThread.Name = "Socket Connection Thread";
             _connectThread.IsBackground = true;

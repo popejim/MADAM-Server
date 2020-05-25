@@ -106,6 +106,7 @@
             this.Name = "frmMadamServerScan";
             this.Text = "MADAM Server";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMadamServerScan_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmMadamServerScan_FormClosed);
             this.Load += new System.EventHandler(this.frmMadamServer_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

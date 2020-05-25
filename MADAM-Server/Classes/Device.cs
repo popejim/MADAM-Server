@@ -16,5 +16,6 @@ namespace MADAM_Server.Classes
         public string osVersion { get; set; }
         public string Manufacturer { get; set; }
         public bool isAd { get; set; }
+        public List<Users> UserList { get; set; }
     }
 }

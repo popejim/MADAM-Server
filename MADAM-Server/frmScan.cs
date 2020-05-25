@@ -31,14 +31,17 @@ namespace MADAM_Server
         //imports dll for using arp resolution
         [DllImport("iphlpapi.dll", ExactSpelling = true)]
         public static extern int SendARP(int DestIP, int SrcIP, byte[] pMacAddr, ref uint PhyAddrLen);
+        //declarations for various vars used in the code
         public List<Device> deviceList = new List<Device>(); 
+        //declare threads for async listener and scan
         public bool hasStarted;
+        private Thread _listenThread;
         public bool listening = true;
         Thread scanThread;
         NetworkInterface[] adapters = new NetworkInterface[10];
         List<string> subnetList = new List<string>();
         List<string> maskList = new List<string>();
-        private Thread _listenThread;
+        
         public bool hasClosed;
 
         public frmMadamServerScan()
@@ -62,7 +65,7 @@ namespace MADAM_Server
             IPAddress ipAddr = IPAddress.Parse(ip);
             try
             {
-
+                //sends ARP request to get mac address from ARP table
                 if (SendARP(BitConverter.ToInt32(ipAddr.GetAddressBytes(),0), 0, macAddr, ref macAddrLen) != 0)
                 {
                     throw new Exception("ARP command failed");
@@ -74,12 +77,15 @@ namespace MADAM_Server
                 Console.WriteLine(e);
                 return null;
             }
-                string[] str = new string[(int)macAddrLen];
-                for (int i = 0; i < macAddrLen; i++)str[i] = macAddr[i].ToString("x2");
-                return string.Join(":", str);
+            //format the mac address string
+            string[] str = new string[(int)macAddrLen];
+            for (int i = 0; i < macAddrLen; i++)str[i] = macAddr[i].ToString("x2");
+            return string.Join(":", str);
         }
+
         private void btnScan_Click(object sender, EventArgs e)
         {
+            //spawns new thread for scan, stops UI hanging
             scanThread = new Thread(scan);
             scanThread.Start();
             hasStarted = true;
@@ -91,16 +97,19 @@ namespace MADAM_Server
             }
             
         }
+
         private async Task<List<PingReply>> PingAsync(string subnet)
         {
+            //pings all IP's within a range, currently only for /24
             List<string> allip = new List<string>();
-            for (int i = 68; i < 70; i++)
+            for (int i = 1; i < 255; i++)
             {
                 string subnetn = "." + i.ToString();
                 allip.Add(subnet + subnetn);
                 Console.WriteLine(i);
             }
             Ping pingSender = new Ping();
+            //sends all pings as async, then awaits completion and adds to a list of successes or failures
             var tasks = allip.Select(ip => new Ping().SendPingAsync(ip, 1000));
             var results = await Task.WhenAll(tasks);
             return results.ToList();
@@ -108,33 +117,35 @@ namespace MADAM_Server
 
         public void scan()
         {
+            //declarations, gets subnet from text box
             string subnet = txtSubnet.Text;
             IPHostEntry ipHostEntry;
             Ping ping;
             IPAddress addr;
             int count = 0;
             ping = new Ping();
+            //sends all pings on subnet to async ping  method
             List<PingReply> pingReply = PingAsync(subnet).Result;
-            Domain local;
-                                
+            AppendTextBox("Starting Network Scan...." + Environment.NewLine);          
             //on successful ping, make new instance of a device
             foreach (PingReply r in pingReply)
             {
+                //only continue if the ping result was a success, ie end device is up
                 if (r.Status == IPStatus.Success)
                 {
                     try
                     {
+                        //gets ip address from ping reply
                         addr = IPAddress.Parse(r.Address.ToString());
                         Device device = new Device();
-
                         try
                         {
-                            
+                            //flush dns to avoid errors
                             System.Diagnostics.Process.Start("cmd.exe","/C ipconfig /flushdns");
                             ipHostEntry = Dns.GetHostEntry(addr.ToString());
-                            
+
+                            //gets host name, if it has a domain strip this
                             device.hostName = ipHostEntry.HostName.ToString();
-                            
                             if (ipHostEntry.HostName.ToString().Contains("."))
                             {
                                 device.name = ipHostEntry.HostName.ToString().Substring(0, device.hostName.IndexOf('.'));
@@ -147,27 +158,24 @@ namespace MADAM_Server
                         }
                         catch (Exception e)
                         {
+                            //if no name returned, fill in with unknown
                             Console.WriteLine(e);
                             device.hostName = "Unknown Device";
                             device.name = "Unknown Device";
                         }
 
+                        //gets mac address from ARP, sends this to the API lookup
                         device.macAddr = GetMacUsingARP(addr.ToString());
                         device.Manufacturer = macApiLookup(device.macAddr);
                         device.ipAddr = addr.ToString();
+                        //runs the getOsVersion remote registry method
                         device.osVersion = getOsVersion(addr.ToString());
+                        //checks for active directory with a simple query
+                        //if returns true, populates users from AD
                         device.isAd = checkAD(addr.ToString());
-                        if (device.Manufacturer.Contains("HUAWEI"))
-                        {
-                            device.osVersion = "Android OS";
-                        }
-                        else if (device.Manufacturer.Contains("Google"))
-                        {
-                            device.osVersion = "Chromecast";
-                        }
                         if (device.isAd == true)
                         {
-                            Util.ADMethods.getUsers(addr.ToString());
+                            device.UserList = Util.ADMethods.getUsers(addr.ToString());
                         }
                         //add details to the text box and sleep to not lock the UI. Increases count of successful devices found.
                         AppendTextBox(device.ipAddr + " " + device.name + " Is up " + " OS: " + device.osVersion + " Mac address: " + device.macAddr + " NIC: " + device.Manufacturer + Environment.NewLine + Environment.NewLine);
@@ -182,6 +190,7 @@ namespace MADAM_Server
                     }
                 }
             }
+            AppendTextBox(Environment.NewLine + "Finishing Network Scan...");
             MessageBox.Show("Scan Complete");
             SaveDevices(deviceList);
             if (InvokeRequired)
@@ -272,17 +281,21 @@ namespace MADAM_Server
                 DirectoryEntry entry = new DirectoryEntry("LDAP://192.168.88.69","MADAM","Test123");
                 DirectorySearcher mySearcher = new DirectorySearcher(entry);
                 mySearcher.Filter = ("(objectClass=computer)");
-                Console.WriteLine("Listing of computers in the Active Directory");
-                Console.WriteLine("============================================"); foreach (SearchResult resEnt in mySearcher.FindAll())
+                if (mySearcher.FindAll() == null )
                 {
-                    Console.WriteLine(resEnt.GetDirectoryEntry().Name.ToString());
+                    Console.WriteLine("AD not detected");
+                    return false;
                 }
-                Console.WriteLine("=========== End of Listing =============");
-                return true;
+                else
+                {
+                    Console.WriteLine("AD detected");
+                    return true;
+                }
+                
             }
             catch (Exception e)
             {
-
+                Console.WriteLine("AD not detected");
                 return false;
             }
         }
@@ -400,6 +413,12 @@ namespace MADAM_Server
         private void frmMadamServerScan_FormClosing(object sender, FormClosingEventArgs e)
         {
             _listenThread.Abort();
+        }
+
+        private void frmMadamServerScan_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            frmMainMenu newfrm = new frmMainMenu();
+            newfrm.Show();
         }
     }
 }
