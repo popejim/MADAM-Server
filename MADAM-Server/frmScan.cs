@@ -368,7 +368,7 @@ namespace MADAM_Server
 
             else
             {
-                var client = new RestClient("https://api.macvendors.com/" + mac);
+                var client = new RestClient("http://api.macvendors.com/" + mac);
                 var request = new RestRequest(Method.GET);
                 IRestResponse response = client.Execute(request);
                 Console.WriteLine(response.Content);

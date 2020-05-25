@@ -21,6 +21,7 @@ namespace MADAM_Server
 
         public bool listening = true;
         public Socket listen;
+        public List<Device> currentDevices;
         private Thread _connectThread;
         public frmMainMenu()
         {
@@ -34,7 +35,7 @@ namespace MADAM_Server
             _connectThread.IsBackground = true;
             _connectThread.Start();
 
-            List<Device> currentDevices = GetDevices();
+            currentDevices = GetDevices();
             if (currentDevices != null)
             {
                 foreach (Device d in currentDevices)
@@ -131,6 +132,31 @@ namespace MADAM_Server
         private void btnClientUpdate_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void lstDevices_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selected = lstDevices.SelectedIndex;
+            PopulateDetails(selected);
+        }
+
+        public void PopulateDetails(int currentSelection)
+        {
+            lstDetails.Items.Clear();
+            Classes.Device deviceInfo = currentDevices[currentSelection];
+            lstDetails.Items.Add(deviceInfo.hostName);
+            lstDetails.Items.Add(deviceInfo.ipAddr);
+            if (deviceInfo.macAddr != null)
+            {
+                lstDetails.Items.Add(deviceInfo.macAddr);
+            }
+            lstDetails.Items.Add("OS " + deviceInfo.osVersion);
+            if (deviceInfo.isAd == true)
+            {
+                lstDetails.Items.Add("Active Directory Detected");
+                lstDetails.Items.Add(deviceInfo.UserList);
+            }
+            
         }
     }
 }
