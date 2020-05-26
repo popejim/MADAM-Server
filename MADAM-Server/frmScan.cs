@@ -42,7 +42,10 @@ namespace MADAM_Server
         List<string> subnetList = new List<string>();
         List<string> maskList = new List<string>();
         
+
         public bool hasClosed;
+
+
 
         public frmMadamServerScan()
         {
@@ -53,7 +56,7 @@ namespace MADAM_Server
             _listenThread = new Thread(listenForUdp);
             _listenThread.Name = "Socket Connection Thread";
             _listenThread.IsBackground = true;
-            //_listenThread.Start();
+            _listenThread.Start();
         }
         
         //returns a mac address by using arp resolution for a given IP address
@@ -102,7 +105,7 @@ namespace MADAM_Server
         {
             //pings all IP's within a range, currently only for /24
             List<string> allip = new List<string>();
-            for (int i = 1; i < 255; i++)
+            for (int i = 1; i < 254; i++)
             {
                 string subnetn = "." + i.ToString();
                 allip.Add(subnet + subnetn);
@@ -293,7 +296,7 @@ namespace MADAM_Server
                 }
                 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine("AD not detected");
                 return false;
@@ -406,6 +409,7 @@ namespace MADAM_Server
                     stream.Close();
                     client.Close();
                     listen.Close();
+                    listening = false;
                 }
             }
         }

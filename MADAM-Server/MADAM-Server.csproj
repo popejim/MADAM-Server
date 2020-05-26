@@ -101,6 +101,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -116,8 +117,24 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <Content Include="Resources\Add_grey_16x.png" />
+    <Content Include="Resources\ASX_Copy_grey_16x.png" />
+    <Content Include="Resources\ASX_Paste_grey_16x.png" />
+    <Content Include="Resources\Close_red_16x.png" />
+    <Content Include="Resources\Cut_16x.png" />
+    <Content Include="Resources\Edit_grey_16x.png" />
+    <Content Include="Resources\ExclamationPoint_16x.png" />
+    <Content Include="Resources\ExportTableToFile_16x.png" />
+    <Content Include="Resources\Loading_16x.png" />
+    <Content Include="Resources\MADAM logo.png" />
+    <Content Include="Resources\madam_logo_s3r_icon.ico" />
+    <Content Include="Resources\Question_16x.png" />
+    <Content Include="Resources\Redo_grey_16x.png" />
+    <Content Include="Resources\Save_16x.png" />
+    <Content Include="Resources\Settings_16x.png" />
+    <Content Include="Resources\Undo_grey_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

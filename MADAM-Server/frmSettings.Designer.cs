@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSettings));
             this.txtControlIP = new System.Windows.Forms.TextBox();
             this.lblControlIP = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -79,6 +80,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblControlIP);
             this.Controls.Add(this.txtControlIP);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmSettings";
             this.Text = "MADAM Server Settings";
             this.Load += new System.EventHandler(this.frmSettings_Load);

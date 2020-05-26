@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMadamServerScan));
             this.btnScan = new System.Windows.Forms.Button();
             this.txtScanResults = new System.Windows.Forms.TextBox();
             this.txtSubnet = new System.Windows.Forms.TextBox();
@@ -103,7 +104,9 @@
             this.Controls.Add(this.txtSubnet);
             this.Controls.Add(this.txtScanResults);
             this.Controls.Add(this.btnScan);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmMadamServerScan";
+            this.RightToLeftLayout = true;
             this.Text = "MADAM Server";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMadamServerScan_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmMadamServerScan_FormClosed);

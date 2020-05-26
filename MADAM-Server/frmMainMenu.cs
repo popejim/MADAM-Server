@@ -13,6 +13,7 @@ using System.Net.Sockets;
 using System.Threading;
 using MADAM_Server.Classes;
 using System.Xml.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace MADAM_Server
 {
@@ -23,6 +24,8 @@ namespace MADAM_Server
         public Socket listen;
         public List<Device> currentDevices;
         private Thread _connectThread;
+        public TcpListener clientListen = new TcpListener(IPAddress.Any, 42073);
+
         public frmMainMenu()
         {
             InitializeComponent();
@@ -131,7 +134,29 @@ namespace MADAM_Server
 
         private void btnClientUpdate_Click(object sender, EventArgs e)
         {
+            _connectThread = new Thread(ListenForClient);
+            _connectThread.Name = "Socket Connection Thread";
+            _connectThread.IsBackground = true;
+            _connectThread.Start();
+        }
 
+        private void ListenForClient()
+        {
+            IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+            
+            clientListen.Start();
+            // Enter the listening loop.
+            while (true)
+            {
+                Console.Write("Waiting for a connection... ");
+                // accept request
+                TcpClient client = clientListen.AcceptTcpClient();
+                NetworkStream stream = client.GetStream();
+                XmlSerializer mySerializer = new XmlSerializer(typeof(List<Users>));
+                List<Users> inList = (List<Users>)mySerializer.Deserialize(stream);
+                stream.Close();
+                client.Close();
+            }
         }
 
         private void lstDevices_SelectedIndexChanged(object sender, EventArgs e)
@@ -143,6 +168,10 @@ namespace MADAM_Server
         public void PopulateDetails(int currentSelection)
         {
             lstDetails.Items.Clear();
+            if (currentSelection == -1)
+            {
+                currentSelection = 1;
+            }
             Classes.Device deviceInfo = currentDevices[currentSelection];
             lstDetails.Items.Add(deviceInfo.hostName);
             lstDetails.Items.Add(deviceInfo.ipAddr);
@@ -153,10 +182,26 @@ namespace MADAM_Server
             lstDetails.Items.Add("OS " + deviceInfo.osVersion);
             if (deviceInfo.isAd == true)
             {
+                List<Users> tempList = deviceInfo.UserList;
                 lstDetails.Items.Add("Active Directory Detected");
-                lstDetails.Items.Add(deviceInfo.UserList);
+                foreach (Users u in tempList)
+                {
+                    lstDetails.Items.Add(u.fullName);
+                }
+                
             }
             
+        }
+
+        private void lstDetails_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void settingsToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            frmSettings settings = new frmSettings();
+            settings.Show();
         }
     }
 }

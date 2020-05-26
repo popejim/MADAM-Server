@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace MADAM_Server.Classes
 {
+    [Serializable]
     public class Users
     {
         public string accounttype { get; set; }
