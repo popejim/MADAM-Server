@@ -93,6 +93,30 @@ namespace MADAM_Server
             }
         }
 
+        public void ListenForCentralUpdate()
+        {
+            //make endpoint for listener on localhost, uses port 42069
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress localIP = host.AddressList.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
+
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, 42060);
+
+            //Make TCP/IP socket
+            listen = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            try
+            {
+                listen.Bind(localEndPoint);
+                listen.Listen(100);
+                listen.BeginAccept(new AsyncCallback(replyDevices), listen);
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine("Unexpected exception : {0}", e.ToString());
+            }
+        }
+
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Enabled = false;
@@ -116,6 +140,23 @@ namespace MADAM_Server
             listening = false;
         }
 
+        private void replyDevices(IAsyncResult ar)
+        {
+            Socket listener2 = (Socket)ar.AsyncState;
+            Socket handler2 = listener2.EndAccept(ar);
+            IPAddress remoteAddress = ((IPEndPoint)handler2.RemoteEndPoint).Address;
+            sendDevices(currentDevices, remoteAddress.ToString());
+        }
+
+        public void sendDevices(List<Device> listToSend, string ip)
+        {
+            TcpClient client = new TcpClient(ip, 42063);
+            NetworkStream nwStream = client.GetStream();
+            XmlSerializer mySerializer = new XmlSerializer(typeof(List<Device>));
+            mySerializer.Serialize(nwStream, listToSend);
+            nwStream.Close();
+            client.Close();
+        }
         private void button1_Click(object sender, EventArgs e)
         {
             frmMadamServerScan frmscan = new frmMadamServerScan();
